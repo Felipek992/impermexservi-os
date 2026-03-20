@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste Gist — Impermex</title>
+<style>
+body{font-family:sans-serif;background:#0D1F15;color:#E8F5EE;padding:20px;margin:0;}
+h1{color:#25A864;font-size:1.1rem;margin-bottom:16px;}
+.card{background:#162A1E;border:1px solid rgba(26,122,74,.3);border-radius:8px;padding:16px;margin-bottom:12px;}
+.label{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:#7AAB8A;margin-bottom:6px;}
+.val{font-size:.9rem;color:#E8F5EE;word-break:break-all;}
+.ok{color:#22c55e;font-weight:600;}
+.err{color:#ef4444;font-weight:600;}
+.foto{width:80px;height:60px;object-fit:cover;border-radius:4px;margin:4px;border:1px solid rgba(26,122,74,.3);}
+.spin{display:inline-block;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<h1>🔍 Teste de Sincronização — Impermex Gist</h1>
+
+<div class="card">
+  <div class="label">Status</div>
+  <div class="val" id="status"><span class="spin">⏳</span> Buscando dados do Gist...</div>
+</div>
+
+<div class="card">
+  <div class="label">Nome da Empresa</div>
+  <div class="val" id="nome">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Telefone</div>
+  <div class="val" id="tel">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Rodapé</div>
+  <div class="val" id="footer">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Modo Manutenção</div>
+  <div class="val" id="manut">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Serviços (primeiro preço)</div>
+  <div class="val" id="servicos">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Fotos da Galeria</div>
+  <div class="val" id="fotos">—</div>
+</div>
+
+<div class="card">
+  <div class="label">Gist ID usado</div>
+  <div class="val" id="gistid">f235c38f818237af39ed15b78b7ae1bd</div>
+</div>
+
+<div class="card">
+  <div class="label">Horário da busca</div>
+  <div class="val" id="hora">—</div>
+</div>
+
+<script>
+const GIST_ID = 'f235c38f818237af39ed15b78b7ae1bd';
+
+async function testar(){
+  document.getElementById('hora').textContent = new Date().toLocaleString('pt-BR');
+  try{
+    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+      headers:{'Cache-Control':'no-cache'}
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    const file = data.files && data.files['impermex-cfg.json'];
+    if(!file || !file.content) throw new Error('Arquivo impermex-cfg.json não encontrado no Gist');
+    const cfg = JSON.parse(file.content);
+    if(!cfg || !Object.keys(cfg).length) throw new Error('Gist está vazio {}');
+
+    document.getElementById('status').innerHTML = '<span class="ok">✅ Gist carregado com sucesso!</span>';
+    document.getElementById('nome').textContent = cfg.businessName || '—';
+    document.getElementById('tel').textContent = cfg.phoneDisplay || '—';
+    document.getElementById('footer').textContent = cfg.footerCopy || '—';
+
+    const m = cfg.manutencao;
+    document.getElementById('manut').innerHTML = m && m.ativo
+      ? '<span class="err">🔧 ATIVO — ' + (m.titulo||'') + '</span>'
+      : '<span class="ok">✅ Desativado — site normal</span>';
+
+    // Primeiro serviço / primeiro preço
+    const sv = cfg.services && cfg.services[0] && cfg.services[0].servicos && cfg.services[0].servicos[0];
+    document.getElementById('servicos').textContent = sv
+      ? `${sv.nome}: ${sv.preco}`
+      : '—';
+
+    // Fotos
+    const gal = (cfg.gallery||[]).filter(g=>g.url);
+    const fotosEl = document.getElementById('fotos');
+    if(gal.length){
+      fotosEl.innerHTML = gal.map(g=>`<img class="foto" src="${g.url}" title="${g.caption||''}" onerror="this.style.border='2px solid #ef4444';this.title='ERRO: '+this.src">`).join('');
+    } else {
+      fotosEl.textContent = 'Nenhuma foto na galeria';
+    }
+
+  }catch(e){
+    document.getElementById('status').innerHTML = '<span class="err">❌ Erro: '+e.message+'</span>';
+  }
+}
+
+testar();
+</script>
+</body>
+</html>
