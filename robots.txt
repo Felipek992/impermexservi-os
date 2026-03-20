@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /painel-im.html
+Disallow: /manutencao.html
+
+Sitemap: https://impermexservicos.com.br/sitemap.xml

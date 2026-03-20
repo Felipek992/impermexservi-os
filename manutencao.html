@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Em Manutenção — Impermex Serviços</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#F8FFFE;font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card{background:#fff;border:1.5px solid rgba(26,122,74,.12);border-radius:20px;padding:52px 40px;max-width:480px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(26,122,74,.08);}
+.ic{font-size:3rem;margin-bottom:20px;}
+.logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:#1A7A4A;margin-bottom:24px;}
+.title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:#1A2E24;margin-bottom:12px;}
+.msg{font-size:.92rem;color:#6B8C7A;line-height:1.65;margin-bottom:28px;}
+.retorno{font-size:.82rem;color:rgba(26,122,74,.7);margin-bottom:24px;}
+.btn{background:#25D366;color:#fff;border:none;padding:14px 32px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;border-radius:50px;transition:all .3s;}
+.btn:hover{opacity:.9;transform:translateY(-2px);}
+</style>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+  try{
+    const d=JSON.parse(sessionStorage.getItem('maint_data')||'{}');
+    if(d.titulo) document.getElementById('titulo').textContent=d.titulo;
+    if(d.mensagem) document.getElementById('msg').textContent=d.mensagem;
+    if(d.retorno) document.getElementById('retorno').textContent='Previsão de retorno: '+new Date(d.retorno+'T12:00:00').toLocaleDateString('pt-BR');
+    if(d.phone){
+      const wa=document.getElementById('wa-btn');
+      wa.href='https://wa.me/'+d.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Olá! Gostaria de agendar um serviço da Impermex Serviços.');
+    }
+    if(d.biz) document.getElementById('biz').textContent=d.biz;
+  }catch(e){}
+});
+</script>
+</head>
+<body>
+<div class="card">
+  <div class="logo" id="biz">Impermex Serviços</div>
+  <div class="ic">🔧</div>
+  <div class="title" id="titulo">Voltamos em breve!</div>
+  <div class="msg" id="msg">Estamos em manutenção. Entre em contato pelo WhatsApp!</div>
+  <div class="retorno" id="retorno"></div>
+  <a id="wa-btn" href="https://wa.me/5585992902592" target="_blank" class="btn">💬 Falar pelo WhatsApp</a>
+</div>
+</body>
+</html>
