@@ -66,19 +66,15 @@ h1{color:#25A864;font-size:1.1rem;margin-bottom:16px;}
 </div>
 
 <script>
-const GIST_ID = 'f235c38f818237af39ed15b78b7ae1bd';
+const RAW_URL = 'https://gist.githubusercontent.com/Felipek992/f235c38f818237af39ed15b78b7ae1bd/raw/impermex-cfg.json';
 
 async function testar(){
   document.getElementById('hora').textContent = new Date().toLocaleString('pt-BR');
   try{
-    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
-      headers:{'Cache-Control':'no-cache'}
-    });
+    const r = await fetch(RAW_URL + '?t=' + Date.now());
     if(!r.ok) throw new Error('HTTP '+r.status);
-    const data = await r.json();
-    const file = data.files && data.files['impermex-cfg.json'];
-    if(!file || !file.content) throw new Error('Arquivo impermex-cfg.json não encontrado no Gist');
-    const cfg = JSON.parse(file.content);
+    const text = await r.text();
+    const cfg = JSON.parse(text);
     if(!cfg || !Object.keys(cfg).length) throw new Error('Gist está vazio {}');
 
     document.getElementById('status').innerHTML = '<span class="ok">✅ Gist carregado com sucesso!</span>';

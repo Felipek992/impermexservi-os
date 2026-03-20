@@ -848,21 +848,16 @@ const IDB = (() => {
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 async function getConfig(){
-  // 1. tenta Gist público (sem token — funciona em qualquer dispositivo)
-  const GIST_ID = 'f235c38f818237af39ed15b78b7ae1bd';
+  // 1. tenta URL raw do Gist (sem rate limit, sem autenticação)
+  const RAW_URL = 'https://gist.githubusercontent.com/Felipek992/f235c38f818237af39ed15b78b7ae1bd/raw/impermex-cfg.json';
   try{
-    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
-      headers:{'Cache-Control':'no-cache'}
-    });
+    const r = await fetch(RAW_URL + '?t=' + Date.now()); // cache-bust
     if(r.ok){
-      const data = await r.json();
-      const file = data.files && data.files['impermex-cfg.json'];
-      if(file && file.content){
-        const cfg = JSON.parse(file.content);
-        if(cfg && Object.keys(cfg).length > 0){
-          localStorage.setItem('impermex_cfg', file.content);
-          return cfg;
-        }
+      const text = await r.text();
+      const cfg = JSON.parse(text);
+      if(cfg && Object.keys(cfg).length > 0){
+        localStorage.setItem('impermex_cfg', text);
+        return cfg;
       }
     }
   }catch(e){ console.warn('Gist indisponível, usando fallback local:', e); }
